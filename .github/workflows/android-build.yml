@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin' # Popular OpenJDK distribution
-          java-version: '11'
+          java-version: '17'
 
       # 3. Set up Node.js (Required for npm, Capacitor CLI)
       #    Adjust 'node-version' if needed
