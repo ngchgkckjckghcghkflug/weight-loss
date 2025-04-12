@@ -68,7 +68,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
             // 2. Calculate schedule time
             const scheduleTime = new Date(Date.now() + delaySeconds * 1000);
-            const notificationId = Date.now()% 2147483647; // Simple unique ID
+            const notificationId = Date.now(); // Simple unique ID
 
             updateStatus(`Scheduling notification (ID: ${notificationId}) for ${scheduleTime.toLocaleTimeString()}`);
 
