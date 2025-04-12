@@ -52,6 +52,16 @@ jobs:
         # You might need to add environment variables here later for release builds
         # env:
         #   ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            android/.gradle
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
       # 7. Make gradlew executable (Gradle Wrapper)
       #    Sometimes needed in Linux environments
