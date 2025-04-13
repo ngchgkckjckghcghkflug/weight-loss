@@ -62,24 +62,38 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+            
+      # Decode Keystore from Secrets <<-- ADDED STEP
+      - name: Decode Keystore
+        # Define path for the keystore file within the runner
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > ${{ github.workspace }}/android/app/signingkey.keystore
+        # Ensure the secret is set in GitHub repo settings
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
 
-      # 7. Make gradlew executable (Gradle Wrapper)
-      #    Sometimes needed in Linux environments
       - name: Make gradlew executable
         run: chmod +x ./android/gradlew
 
-      # 8. Build Android Debug APK
-      #    Navigates into the android directory and runs the debug build task
-      - name: Build Debug APK
+      # Build Android Debug APK - Pass secrets as ENV variables <<-- MODIFIED STEP
+      - name: Build Debug APK (Signed)
+        env: # Define environment variables for Gradle
+          SIGNING_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          # Point to the decoded keystore file location relative to the android directory
+          SIGNING_STORE_FILE: app/signingkey.keystore
         run: |
           cd ./android
           ./gradlew assembleDebug --no-daemon
-          cd .. # Go back to root directory
+          cd ..
 
-      # 9. Upload Debug APK as Artifact
-      #    This makes the generated APK available for download from the Actions run page
+      # Clean up decoded keystore file after build <<-- ADDED STEP (Optional but good practice)
+      - name: Cleanup Keystore
+        run: rm -f ${{ github.workspace }}/android/app/signingkey.keystore
+
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: debug-apk # Name of the artifact zip file
-          path: android/app/build/outputs/apk/debug/app-debug.apk # Path to the generated APK
+          name: signed-debug-apk # Changed artifact name slightly
+          path: android/app/build/outputs/apk/debug/app-debug.apk
