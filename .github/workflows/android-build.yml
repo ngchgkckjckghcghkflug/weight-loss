@@ -38,8 +38,6 @@ jobs:
 
       # 5. Add the Android platform to the Capacitor project <<-- ADD THIS STEP
       #    This configures the project and creates the android/ folder if needed
-      - name: Add Android Platform
-        run: npx cap add android
 
       # 5. Sync Capacitor project (copies web assets, updates native project)
       - name: Capacitor Sync
